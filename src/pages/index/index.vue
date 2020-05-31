@@ -1,9 +1,8 @@
 <template lang="wxml">
 <view class="content">
   <!-- 搜索框 -->
-  <view class="search">
-	<input type="text" />
-  </view>
+  <search-index></search-index>
+
   <!-- 轮播图 -->
   <swiper class="swiper"
     indicator-dots
@@ -127,31 +126,26 @@
 </template>
 
 <script>
-	export default {
-		data() {
-			return {
-				title: 'Hello'
-			}
-		},
-		onLoad() {
-
-		},
-		methods: {
-
-		}
+import SearchIndex from "../../components/search"
+export default {
+  data() {
+	return {
+		title: 'Hello'
 	}
+  },
+  components: {
+    SearchIndex
+  },
+  onLoad() {
+
+  },
+  methods: {
+
+  }
+}
 </script>
 
 <style lang="less">
-.search {
-  background-color: #ff2d4a;
-  padding: 20rpx 16rpx;
-  input {
-	height: 60rpx;
-	background-color: #fff;
-	border-radius: 10rpx;
-  }
-}
 
 .swiper {
   image {
