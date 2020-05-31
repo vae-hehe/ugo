@@ -1,10 +1,129 @@
-<template>
-	<view class="content">
-		<image class="logo" src="/static/logo.png"></image>
-		<view>
-			<text class="title">{{title}}</text>
-		</view>
+<template lang="wxml">
+<view class="content">
+  <!-- 搜索框 -->
+  <view class="search">
+	<input type="text" />
+  </view>
+  <!-- 轮播图 -->
+  <swiper class="swiper"
+    indicator-dots
+	indicator-color="rgba(255,255,255,.3)"
+	indicator-active-color="#fff"
+	autoplay
+	interval="2000"
+	circular
+  >
+	<swiper-item class="item">
+	  <image src="../../static/uploads/banner1.png" />
+	</swiper-item>
+	<swiper-item class="item">
+	  <image src="../../static/uploads/banner2.png" />
+	</swiper-item>
+	<swiper-item class="item">
+	  <image src="../../static/uploads/banner3.png" />
+	</swiper-item>
+  </swiper>
+
+  <!-- 导航栏 -->
+  <view class="nav">
+	<navigator>
+	  <image src="../../static/uploads/icon_index_nav_1@2x.png" />
+	</navigator>
+	<navigator>
+	  <image src="../../static/uploads/icon_index_nav_2@2x.png" />
+	</navigator>
+	<navigator>
+	  <image src="../../static/uploads/icon_index_nav_3@2x.png" />
+	</navigator>
+	<navigator>
+	  <image src="../../static/uploads/icon_index_nav_4@2x.png" />
+	</navigator>
+  </view>
+
+  <!-- 楼层数据 -->
+  <view class="floors">
+
+    <!-- 第一层 -->
+	<view class="floor">
+	  <view class="title">
+		<navigator>
+			<image src="../../static/uploads/pic_floor01_title.png" />
+		</navigator>
+	  </view>
+	  <view class="imgs_1">
+		<navigator>
+			<image src="../../static/uploads/pic_floor01_1@2x.png" />
+		</navigator>
+		<navigator>
+			<image src="../../static/uploads/pic_floor01_2@2x.png" />
+		</navigator>
+		<navigator>
+			<image src="../../static/uploads/pic_floor01_3@2x.png" />
+		</navigator>
+		<navigator>
+			<image src="../../static/uploads/pic_floor01_4@2x.png" />
+		</navigator>
+		<navigator>
+			<image src="../../static/uploads/pic_floor01_5@2x.png" />
+		</navigator>
+	  </view>
 	</view>
+
+	<!-- 第二层 -->
+	<view class="floor">
+	  <view class="title">
+		<navigator>
+			<image src="../../static/uploads/pic_floor02_title.png" />
+		</navigator>
+	  </view>
+	  <view class="imgs">
+		<navigator>
+			<image src="../../static/uploads/pic_floor02_1@2x.png" />
+		</navigator>
+		<navigator>
+			<image src="../../static/uploads/pic_floor02_2@2x.png" />
+		</navigator>
+		<navigator>
+			<image src="../../static/uploads/pic_floor02_3@2x.png" />
+		</navigator>
+		<navigator>
+			<image src="../../static/uploads/pic_floor02_4@2x.png" />
+		</navigator>
+		<navigator>
+			<image src="../../static/uploads/pic_floor02_5@2x.png" />
+		</navigator>
+	  </view>
+	</view>
+
+	<!-- 第三层 -->
+    <view class="floor">
+	  <view class="title">
+		<navigator>
+			<image src="../../static/uploads/pic_floor03_title.png" />
+		</navigator>
+	  </view>
+	  <view class="imgs">
+		<navigator>
+			<image src="../../static/uploads/pic_floor03_1@2x.png" />
+		</navigator>
+		<navigator>
+			<image src="../../static/uploads/pic_floor03_2@2x.png" />
+		</navigator>
+		<navigator>
+			<image src="../../static/uploads/pic_floor03_3@2x.png" />
+		</navigator>
+		<navigator>
+			<image src="../../static/uploads/pic_floor03_4@2x.png" />
+		</navigator>
+		<navigator>
+			<image src="../../static/uploads/pic_floor03_5@2x.png" />
+		</navigator>
+	  </view>
+	</view>
+
+  </view>
+</view>
+</template>
 </template>
 
 <script>
@@ -23,20 +142,98 @@
 	}
 </script>
 
-<style>
-	.content {
-		text-align: center;
-		height: 400upx;
-	}
+<style lang="less">
+.search {
+  background-color: #ff2d4a;
+  padding: 20rpx 16rpx;
+  input {
+	height: 60rpx;
+	background-color: #fff;
+	border-radius: 10rpx;
+  }
+}
 
-	.logo {
-		height: 200upx;
-		width: 200upx;
-		margin-top: 200upx;
-	}
+.swiper {
+  image {
+	width: 750rpx;
+	height: 340rpx;
+  }
+}
 
-	.title {
-		font-size: 36upx;
-		color: #8f8f94;
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  image {
+	width: 128rpx;
+	height: 128rpx;
+	margin-top: 14rpx;
+	margin-bottom: 29rpx;
+  }
+}
+
+.floor {
+  .title {
+	image {
+	  width: 750rpx;
+	  height: 90rpx;
 	}
+  }
+  .imgs {
+	padding: 20rpx 16rpx;
+	overflow: hidden;
+	navigator {
+	  float: left;
+	  image {
+		width: 100%;
+		height: 100%;
+	  }
+	}
+	navigator:nth-child(1) {
+	  width: 232rpx;
+	  height: 386rpx;
+	  margin-right: 10rpx;
+	}
+	navigator:nth-child(2),navigator:nth-child(5) {
+	  width: 273rpx;
+	  height: 188rpx;
+	}
+	navigator:nth-child(3),navigator:nth-child(4) {
+	  width: 203rpx;
+	  height: 188rpx;
+	}
+	navigator:nth-child(2),navigator:nth-child(4) {
+	  margin-right: 10rpx;
+	}
+	navigator:nth-child(2),navigator:nth-child(3) {
+	  margin-bottom: 10rpx;
+	}
+  }
+  .imgs_1 {
+	padding: 20rpx 16rpx;
+	overflow: hidden;
+	navigator {
+	  float: left;
+	  image {
+		width: 100%;
+		height: 100%;
+	  }
+	}
+	navigator:nth-child(1) {
+	  width: 232rpx;
+	  height: 386rpx;
+	  margin-right: 10rpx;
+	}
+	navigator {
+	  width: 238rpx;
+	  height: 188rpx;
+	}
+	navigator:nth-child(2),navigator:nth-child(4) {
+	  margin-right: 10rpx;
+	}
+	navigator:nth-child(2),navigator:nth-child(3) {
+	  margin-bottom: 10rpx;
+	}
+  }
+}
 </style>
