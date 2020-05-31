@@ -23,7 +23,7 @@ export default {
   props: {},
   data () {
     return {
-      showHistory: true, // 是否显示历史搜索页面
+      showHistory: false, // 是否显示历史搜索页面
       placeholder: "" // 获取焦点的时候, 输入框默认没有数据
     }
   },
@@ -35,10 +35,18 @@ export default {
     focus() {
       this.showHistory = true
       this.placeholder = "请输入要搜索的商品"
+
+      // 获取窗口的高度
+      var obj = uni.getSystemInfoSync()
+      this.$emit('windowHeight', obj.windowHeight + "px")
+
     },
     blur() {
       this.showHistory = false
       this.placeholder = ""
+
+      // 如果失去焦点的话, 默认页面还是会出现滚动条
+      this.$emit('windowHeight', "")
     }
   }
 }
@@ -88,6 +96,10 @@ export default {
 
 // 获取焦点的时候
 .focus {
+  z-index: 9999;
+  position: absolute;
+  width: 100%;
+  height: 100%;
   .search {
     background-color: #eeeeee;
     padding: 20rpx 16rpx;
@@ -133,9 +145,17 @@ export default {
     }
   }
 
-
+  // 历史搜索页面应该显示一整个窗口
+  // 此时出现问题: 页面有滚动条, 因为页面覆盖在首页上, 所以会出现滚动条问题
+  // 父子组件之间通信
   .history {
     display: block;
+    background-color: pink;
+    position: absolute;
+    top: 88rpx;
+    bottom: 0;
+    left: 0;
+    right: 0;
   } 
 }
 </style>

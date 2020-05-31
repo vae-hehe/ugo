@@ -1,7 +1,7 @@
 <template lang="wxml">
-<view class="content">
+<view class="content" :style="{'height': height, 'overflow': 'hidden'}">
   <!-- 搜索框 -->
-  <search-index></search-index>
+  <search-index @windowHeight="windowHeight"></search-index>
 
   <!-- 轮播图 -->
   <swiper class="swiper"
@@ -123,14 +123,14 @@
   </view>
 </view>
 </template>
-</template>
+
 
 <script>
 import SearchIndex from "../../components/search"
 export default {
   data() {
 	return {
-		title: 'Hello'
+		height: "" // 高度默认是空
 	}
   },
   components: {
@@ -140,7 +140,11 @@ export default {
 
   },
   methods: {
-
+	// 执行事件函数
+    windowHeight(e) {
+	  console.log(e)
+	  this.height = e 
+	}
   }
 }
 </script>
