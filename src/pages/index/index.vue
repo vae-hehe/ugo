@@ -126,6 +126,13 @@ export default {
   },
   onPageScroll(e) {
 	this.scrollTop = e.scrollTop
+  },
+  // 下拉刷新
+  onPullDownRefresh() {
+	this.get_swiper(),
+	this.get_nav(),
+	this.get_floors()
+	uni.stopPullDownRefresh()
   }
 }
 </script>
