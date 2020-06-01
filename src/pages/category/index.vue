@@ -6,6 +6,7 @@
     <view class="category">
       <!-- 顶级分类 -->
       <view class="sup">
+        <!-- 实现页面局部滚动, 纵轴滚动 -->
         <scroll-view scroll-y>
           <!-- 判断下标是0 的时候, 才会选中 -->
           <text
@@ -18,6 +19,7 @@
       </view>
 
       <view class="sub">
+        <!-- 实现页面局部滚动, 纵轴滚动 -->
         <scroll-view scroll-y>
           <!-- 封面图 -->
           <image src="http://static.botue.com/ugo/uploads/category.png" class="thumb"></image>
