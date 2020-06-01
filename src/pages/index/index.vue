@@ -23,17 +23,8 @@
 
   <!-- 导航栏 -->
   <view class="nav">
-	<navigator>
-	  <image src="../../static/uploads/icon_index_nav_1@2x.png" />
-	</navigator>
-	<navigator>
-	  <image src="../../static/uploads/icon_index_nav_2@2x.png" />
-	</navigator>
-	<navigator>
-	  <image src="../../static/uploads/icon_index_nav_3@2x.png" />
-	</navigator>
-	<navigator>
-	  <image src="../../static/uploads/icon_index_nav_4@2x.png" />
+	<navigator v-for="(item, index) in nav_arr" :key="index">
+	  <image :src="item.image_src" />
 	</navigator>
   </view>
 
@@ -41,79 +32,19 @@
   <view class="floors">
 
     <!-- 第一层 -->
-	<view class="floor">
+	<view
+	  class="floor"
+	  v-for="(item, index) in list"
+	  :key="index"
+	>
 	  <view class="title">
 		<navigator>
-			<image src="../../static/uploads/pic_floor01_title.png" />
+			<image :src="item.floor_title.image_src" />
 		</navigator>
 	  </view>
 	  <view class="imgs_1">
-		<navigator>
-			<image src="../../static/uploads/pic_floor01_1@2x.png" />
-		</navigator>
-		<navigator>
-			<image src="../../static/uploads/pic_floor01_2@2x.png" />
-		</navigator>
-		<navigator>
-			<image src="../../static/uploads/pic_floor01_3@2x.png" />
-		</navigator>
-		<navigator>
-			<image src="../../static/uploads/pic_floor01_4@2x.png" />
-		</navigator>
-		<navigator>
-			<image src="../../static/uploads/pic_floor01_5@2x.png" />
-		</navigator>
-	  </view>
-	</view>
-
-	<!-- 第二层 -->
-	<view class="floor">
-	  <view class="title">
-		<navigator>
-			<image src="../../static/uploads/pic_floor02_title.png" />
-		</navigator>
-	  </view>
-	  <view class="imgs">
-		<navigator>
-			<image src="../../static/uploads/pic_floor02_1@2x.png" />
-		</navigator>
-		<navigator>
-			<image src="../../static/uploads/pic_floor02_2@2x.png" />
-		</navigator>
-		<navigator>
-			<image src="../../static/uploads/pic_floor02_3@2x.png" />
-		</navigator>
-		<navigator>
-			<image src="../../static/uploads/pic_floor02_4@2x.png" />
-		</navigator>
-		<navigator>
-			<image src="../../static/uploads/pic_floor02_5@2x.png" />
-		</navigator>
-	  </view>
-	</view>
-
-	<!-- 第三层 -->
-    <view class="floor">
-	  <view class="title">
-		<navigator>
-			<image src="../../static/uploads/pic_floor03_title.png" />
-		</navigator>
-	  </view>
-	  <view class="imgs">
-		<navigator>
-			<image src="../../static/uploads/pic_floor03_1@2x.png" />
-		</navigator>
-		<navigator>
-			<image src="../../static/uploads/pic_floor03_2@2x.png" />
-		</navigator>
-		<navigator>
-			<image src="../../static/uploads/pic_floor03_3@2x.png" />
-		</navigator>
-		<navigator>
-			<image src="../../static/uploads/pic_floor03_4@2x.png" />
-		</navigator>
-		<navigator>
-			<image src="../../static/uploads/pic_floor03_5@2x.png" />
+		<navigator v-for="one in item.product_list" :key="one.name">
+			<image :src="one.image_src" />
 		</navigator>
 	  </view>
 	</view>
@@ -129,14 +60,18 @@ export default {
   data() {
 	return {
 		height: "", // 高度默认是空
-		swiper_arr: []
+		swiper_arr: [],
+		nav_arr: [],
+		list: []
 	}
   },
   components: {
     SearchIndex
   },
   onLoad() {
-	this.get_swiper()	
+	this.get_swiper(),
+	this.get_nav(),
+	this.get_floors()
   },
   methods: {
 	// 执行事件函数
@@ -161,6 +96,20 @@ export default {
 	  })
 	//   console.log(res)
 	  this.swiper_arr = message
+	},
+
+	async get_nav() {
+	  const {message} = await this.request({
+		url: '/api/public/v1/home/catitems'
+	  })
+	  this.nav_arr = message
+	},
+
+	async get_floors() {
+	  const {message} = await this.request({
+		url: '/api/public/v1/home/floordata'
+	  })
+	  this.list = message
 	}
   }
 }
