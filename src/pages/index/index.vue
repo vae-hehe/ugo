@@ -31,7 +31,6 @@
   <!-- 楼层数据 -->
   <view class="floors">
 
-    <!-- 第一层 -->
 	<view
 	  class="floor"
 	  v-for="(item, index) in list"
@@ -50,6 +49,11 @@
 	</view>
 
   </view>
+
+  <!-- 回到顶部 -->
+  <view class="top" @click="goTop" v-if="scrollTop > 200">
+	<icon type="top" size="23" />
+  </view>
 </view>
 </template>
 
@@ -62,7 +66,8 @@ export default {
 		height: "", // 高度默认是空
 		swiper_arr: [],
 		nav_arr: [],
-		list: []
+		list: [],
+		scrollTop: 0
 	}
   },
   components: {
@@ -110,7 +115,17 @@ export default {
 		url: '/api/public/v1/home/floordata'
 	  })
 	  this.list = message
+	},
+
+	goTop() {
+	  // 将页面滚动到指定位置
+      uni.pageScrollTo({
+		scrollTop: 0
+	  })
 	}
+  },
+  onPageScroll(e) {
+	this.scrollTop = e.scrollTop
   }
 }
 </script>
@@ -199,5 +214,16 @@ export default {
 	  margin-bottom: 10rpx;
 	}
   }
+}
+
+.top {
+  position: fixed;
+  right: 40rpx;
+  bottom: 30rpx;
+  width: 100rpx;
+  height: 100rpx;
+//   background-color: #fff ;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .8);
 }
 </style>
