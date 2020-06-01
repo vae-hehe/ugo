@@ -12,14 +12,12 @@
 	interval="2000"
 	circular
   >
-	<swiper-item class="item">
-	  <image src="../../static/uploads/banner1.png" />
-	</swiper-item>
-	<swiper-item class="item">
-	  <image src="../../static/uploads/banner2.png" />
-	</swiper-item>
-	<swiper-item class="item">
-	  <image src="../../static/uploads/banner3.png" />
+	<swiper-item
+	  class="item"
+	  v-for="(item, index) in swiper_arr"
+	  :key="index"
+	>
+	  <image :src="item.image_src" />
 	</swiper-item>
   </swiper>
 
@@ -130,20 +128,39 @@ import SearchIndex from "../../components/search"
 export default {
   data() {
 	return {
-		height: "" // 高度默认是空
+		height: "", // 高度默认是空
+		swiper_arr: []
 	}
   },
   components: {
     SearchIndex
   },
   onLoad() {
-
+	this.get_swiper()	
   },
   methods: {
 	// 执行事件函数
     windowHeight(e) {
 	  console.log(e)
 	  this.height = e 
+	},
+
+	// 渲染轮播图
+	// async get_swiper() {
+	//   const [err, res] = await uni.request({
+	// 	url: 'https://api-ugo-web.itheima.net/api/public/v1/home/swiperdata'
+	//   })
+	//   console.log(res)
+	//   this.swiper = res.data.message
+	// }
+
+
+	async get_swiper() {
+	  const {message} = await this.request({
+		url: '/api/public/v1/home/swiperdata'
+	  })
+	//   console.log(res)
+	  this.swiper_arr = message
 	}
   }
 }
