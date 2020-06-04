@@ -56,11 +56,11 @@
 
     data () {
       return {
-		pageHeight: 'auto',
-		swiper: [],
-		nav_list: [],
-		floors: [],
-		scrollTop: 0
+		    pageHeight: 'auto',
+		    swiper: [],
+		    nav_list: [],
+		    floors: [],
+		    scrollTop: 0
       }
     },
 
@@ -122,8 +122,16 @@
 	  this.get_floors()
 	  // 停止刷新
 	  uni.stopPullDownRefresh()
-	}
+  },
+  
+  //转发
+  onShareAppMessage() {
+    return {
+      imageUrl: './1.jpg',
+      title: '111'
+    }
   }
+}
 </script>
 
 <style scoped lang="less">
