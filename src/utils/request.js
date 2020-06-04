@@ -14,7 +14,8 @@ export default function(Vue) {
 
       // 封装请求, uni-app 支持 promise async await处理
       const [err, res] = await uni.request({
-        url: baseUrl + opts.url
+        url: baseUrl + opts.url,
+        data: opts.data
       })
 
       // 结束加载

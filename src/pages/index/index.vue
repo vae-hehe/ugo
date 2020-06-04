@@ -1,236 +1,213 @@
-<template lang="wxml">
-<view class="content" :style="{'height': height, 'overflow': 'hidden'}">
-  <!-- 搜索框 -->
-  <search-index @windowHeight="windowHeight"></search-index>
+<template>
+  <view :style="{height: pageHeight, overflow: 'hidden'}">
+	<!-- 搜索框 -->
+    <search @search="disableScroll" />
 
-  <!-- 轮播图 -->
-  <swiper class="swiper"
-    indicator-dots
-	indicator-color="rgba(255,255,255,.3)"
-	indicator-active-color="#fff"
-	autoplay
-	interval="2000"
-	circular
-  >
-	<swiper-item
-	  class="item"
-	  v-for="(item, index) in swiper_arr"
-	  :key="index"
-	>
-	  <image :src="item.image_src" />
-	</swiper-item>
-  </swiper>
+    <!-- 轮播图 -->
+    <swiper class="banner" indicator-dots indicator-color="rgba(255, 255, 255, 0.6)" indicator-active-color="#fff">
+      <swiper-item v-for="item in swiper" :key="item.goods_id">
+        <navigator :url="'/pages/goods/index?id=' + item.goods_id">
+          <image :src="item.image_src"></image>
+        </navigator>
+      </swiper-item>
+    </swiper>
 
-  <!-- 导航栏 -->
-  <view class="nav">
-	<navigator v-for="(item, index) in nav_arr" :key="index">
-	  <image :src="item.image_src" />
-	</navigator>
+    <!-- 导航条 -->
+    <view class="navs">
+      <navigator
+	    open-type="switchTab"
+		url="/pages/category/index"
+		v-for="(item, index) in nav_list"
+		:key="index"
+	  >
+        <image :src="item.image_src"></image>
+      </navigator>
+    </view>
+
+    <!-- 楼层 -->
+    <view class="floors">
+
+      <view class="floor" v-for="(item, index) in floors" :key="index">
+        <view class="title">
+          <image :src="item.floor_title.image_src"></image>
+        </view>
+        <view class="items">
+          <navigator :url="one.navigator_url" v-for="(one, index) in item.product_list" :key="index">
+            <image :src="one.image_src"></image>
+          </navigator>
+        </view>
+      </view>
+
+    </view>
+
+    <!-- 回到顶部 -->
+    <view
+	  class="goTop icon-top"
+	  @tap="goTop"
+	  v-if="scrollTop > 100"
+	></view>
   </view>
-
-  <!-- 楼层数据 -->
-  <view class="floors">
-
-	<view
-	  class="floor"
-	  v-for="(item, index) in list"
-	  :key="index"
-	>
-	  <view class="title">
-		<navigator>
-			<image :src="item.floor_title.image_src" />
-		</navigator>
-	  </view>
-	  <view class="imgs_1">
-		<navigator v-for="one in item.product_list" :key="one.name">
-			<image :src="one.image_src" />
-		</navigator>
-	  </view>
-	</view>
-
-  </view>
-
-  <!-- 回到顶部 -->
-  <view class="top" @click="goTop" v-if="scrollTop > 200">
-	<icon type="top" size="23" />
-  </view>
-</view>
 </template>
 
-
 <script>
-import SearchIndex from "../../components/search"
-export default {
-  data() {
-	return {
-		height: "", // 高度默认是空
-		swiper_arr: [],
-		nav_arr: [],
-		list: [],
+  import search from '@/components/search';
+
+  export default {
+
+    data () {
+      return {
+		pageHeight: 'auto',
+		swiper: [],
+		nav_list: [],
+		floors: [],
 		scrollTop: 0
+      }
+    },
+
+    components: {
+      search
+    },
+    
+    methods: {
+      disableScroll (ev) {
+        this.pageHeight = ev.pageHeight + 'px';
+	  },
+	  
+	  // 获取轮播图
+	  async get_swiper() {
+		const {message} = await this.request({
+		  url: '/api/public/v1/home/swiperdata'
+		})
+		this.swiper = message
+	  },
+
+	  // 导航
+	  async get_nav() {
+		const {message} = await this.request({
+		  url:'/api/public/v1/home/catitems'
+		})
+		this.nav_list = message
+	  },
+
+	  // 楼层
+	  async get_floors() {
+		const {message} = await this.request({
+		  url: '/api/public/v1/home/floordata'
+		})
+		this.floors = message
+	  },
+	  
+	  // 回到顶部
+	  goTop() {
+		uni.pageScrollTo({
+		  scrollTop: 0
+		})
+	  }
+	},
+	
+	onLoad() {
+	  this.get_swiper(),
+	  this.get_nav(),
+	  this.get_floors()
+	},
+
+	// 滚动距离, 回调函数
+	onPageScroll(e) {
+	  this.scrollTop = e.scrollTop
+	},
+
+	onPullDownRefresh() {
+	  this.get_swiper(),
+	  this.get_nav(),
+	  this.get_floors()
+	  // 停止刷新
+	  uni.stopPullDownRefresh()
 	}
-  },
-  components: {
-    SearchIndex
-  },
-  onLoad() {
-	this.get_swiper(),
-	this.get_nav(),
-	this.get_floors()
-  },
-  methods: {
-	// 执行事件函数
-    windowHeight(e) {
-	  console.log(e)
-	  this.height = e 
-	},
-
-	// 渲染轮播图
-	// async get_swiper() {
-	//   const [err, res] = await uni.request({
-	// 	url: 'https://api-ugo-web.itheima.net/api/public/v1/home/swiperdata'
-	//   })
-	//   console.log(res)
-	//   this.swiper = res.data.message
-	// }
-
-
-	async get_swiper() {
-	  const {message} = await this.request({
-		url: '/api/public/v1/home/swiperdata'
-	  })
-	//   console.log(res)
-	  this.swiper_arr = message
-	},
-
-	async get_nav() {
-	  const {message} = await this.request({
-		url: '/api/public/v1/home/catitems'
-	  })
-	  this.nav_arr = message
-	},
-
-	async get_floors() {
-	  const {message} = await this.request({
-		url: '/api/public/v1/home/floordata'
-	  })
-	  this.list = message
-	},
-
-	goTop() {
-	  // 将页面滚动到指定位置
-      uni.pageScrollTo({
-		scrollTop: 0
-	  })
-	}
-  },
-  onPageScroll(e) {
-	this.scrollTop = e.scrollTop
-  },
-  // 下拉刷新
-  onPullDownRefresh() {
-	this.get_swiper(),
-	this.get_nav(),
-	this.get_floors()
-	uni.stopPullDownRefresh()
   }
-}
 </script>
 
-<style lang="less">
+<style scoped lang="less">
+  .banner {
+    width: 100%;
+    height: 340rpx;
 
-.swiper {
-  image {
-	width: 750rpx;
-	height: 340rpx;
+    image {
+      width: 100%;
+      height: 340rpx;
+    }
   }
-}
 
-.nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  image {
-	width: 128rpx;
-	height: 128rpx;
-	margin-top: 14rpx;
-	margin-bottom: 29rpx;
-  }
-}
+  .navs {
+    display: flex;
+    justify-content: space-between;
+    padding: 30rpx 44rpx;
 
-.floor {
-  .title {
-	image {
-	  width: 750rpx;
-	  height: 90rpx;
-	}
+    image {
+      width: 128rpx;
+      height: 140rpx;
+    }
   }
-  .imgs {
-	padding: 20rpx 16rpx;
-	overflow: hidden;
-	navigator {
-	  float: left;
-	  image {
-		width: 100%;
-		height: 100%;
-	  }
-	}
-	navigator:nth-child(1) {
-	  width: 232rpx;
-	  height: 386rpx;
-	  margin-right: 10rpx;
-	}
-	navigator:nth-child(2),navigator:nth-child(5) {
-	  width: 273rpx;
-	  height: 188rpx;
-	}
-	navigator:nth-child(3),navigator:nth-child(4) {
-	  width: 203rpx;
-	  height: 188rpx;
-	}
-	navigator:nth-child(2),navigator:nth-child(4) {
-	  margin-right: 10rpx;
-	}
-	navigator:nth-child(2),navigator:nth-child(3) {
-	  margin-bottom: 10rpx;
-	}
-  }
-  .imgs_1 {
-	padding: 20rpx 16rpx;
-	overflow: hidden;
-	navigator {
-	  float: left;
-	  image {
-		width: 100%;
-		height: 100%;
-	  }
-	}
-	navigator:nth-child(1) {
-	  width: 232rpx;
-	  height: 386rpx;
-	  margin-right: 10rpx;
-	}
-	navigator {
-	  width: 238rpx;
-	  height: 188rpx;
-	}
-	navigator:nth-child(2),navigator:nth-child(4) {
-	  margin-right: 10rpx;
-	}
-	navigator:nth-child(2),navigator:nth-child(3) {
-	  margin-bottom: 10rpx;
-	}
-  }
-}
 
-.top {
-  position: fixed;
-  right: 40rpx;
-  bottom: 30rpx;
-  width: 100rpx;
-  height: 100rpx;
-//   background-color: #fff ;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, .8);
-}
+  .floor {
+
+    .title {
+      width: 750rpx;
+      height: 60rpx;
+      padding: 20rpx 0 0 8rpx;
+      background-color: #f4f4f4;
+    }
+
+    .items {
+      padding: 20rpx 16rpx;
+      overflow: hidden;
+
+      navigator {
+        width: 193rpx;
+        height: 188rpx;
+        margin-left: 10rpx;
+        margin-bottom: 10rpx;
+        float: left;
+      }
+
+      navigator:first-child {
+        width: 232rpx;
+        height: 386rpx;
+        margin-left: 0rpx;
+      }
+
+      navigator:nth-child(2),
+      navigator:nth-child(5) {
+        width: 273rpx;
+      }
+    }
+
+    &:first-child {
+
+      .items {
+
+        navigator {
+          width: 233rpx;
+        }
+      }
+    }
+  }
+
+  .goTop {
+    position: fixed;
+    bottom: 30rpx;
+    /* #ifdef H5 */
+    bottom: 65px;
+    /* #endif */
+    right: 30rpx;
+  
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100rpx;
+    height: 100rpx;
+    font-size: 48rpx;
+    color: #666;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.8);
+  }
 </style>
