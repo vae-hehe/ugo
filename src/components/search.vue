@@ -3,41 +3,28 @@
   <div class="search" :class="{focused: focused}">
     <!-- 搜索框 -->
     <div class="input-wrap" @click="goSearch">
-      <input type="text" :placeholder="placeholder">
+      <input
+        type="text"
+        :placeholder="placeholder"
+        v-model="query"
+        @input="input"
+        @confirm="confirm"
+      >
       <span class="cancle" @click.stop="cancleSearch">取消</span>
     </div>
     <!-- 搜索结果 -->
     <div class="content">
-      <div class="title">搜索历史<span class="clear"></span></div>
-      <div class="history">
-        <navigator url="/pages/list/index">小米</navigator>
-        <navigator url="/pages/list/index">智能电视</navigator>
-        <navigator url="/pages/list/index">小米空气净化器</navigator>
-        <navigator url="/pages/list/index">西门子洗碗机</navigator>
-        <navigator url="/pages/list/index">华为手机</navigator>
-        <navigator url="/pages/list/index">苹果</navigator>
-        <navigator url="/pages/list/index">锤子</navigator>
+      <div class="title">搜索历史<span class="clear" @tap="clear"></span></div>
+      <div class="history" v-if="result.length === 0">
+        <navigator
+          :url="'/pages/list/index?query=' + item"
+          v-for="(item, index) in history"
+          :key="index"
+        >{{item}}</navigator>
       </div>
-      <!-- 结果 -->
-      <scroll-view scroll-y class="result">
-        <navigator url="/pages/goods/index">小米</navigator>
-        <navigator url="/pages/goods/index">小米</navigator>
-        <navigator url="/pages/goods/index">小米</navigator>
-        <navigator url="/pages/goods/index">小米</navigator>
-        <navigator url="/pages/goods/index">小米</navigator>
-        <navigator url="/pages/goods/index">小米</navigator>
-        <navigator url="/pages/goods/index">小米</navigator>
-        <navigator url="/pages/goods/index">小米</navigator>
-        <navigator url="/pages/goods/index">小米</navigator>
-        <navigator url="/pages/goods/index">小米</navigator>
-        <navigator url="/pages/goods/index">小米</navigator>
-        <navigator url="/pages/goods/index">小米</navigator>
-        <navigator url="/pages/goods/index">小米</navigator>
-        <navigator url="/pages/goods/index">小米</navigator>
-        <navigator url="/pages/goods/index">小米</navigator>
-        <navigator url="/pages/goods/index">小米</navigator>
-        <navigator url="/pages/goods/index">小米</navigator>
-        <navigator url="/pages/goods/index">小米</navigator>
+      <!-- 搜索建议 -->
+      <scroll-view scroll-y class="result" v-else>
+        <navigator :url="'/pages/goods/index?id=' + item.goods_id" v-for="(item, index) in result" :key="index">{{item.goods_name}}</navigator>
       </scroll-view>
     </div>
   </div>
@@ -48,10 +35,17 @@
     data () {
       return {
         focused: false,
-        placeholder: ''
+        placeholder: '',
+        // 搜索内容
+        query: '',
+        // 搜索结果
+        result: [],
+        // 历史搜索
+        history: uni.getStorageSync('history') || []
       }
     },
     methods: {
+      // 获取焦点
       goSearch (ev) {
         this.focused = true;
         this.placeholder = '请输入您要搜索的内容';
@@ -64,6 +58,8 @@
         // 隐藏tabBar
         uni.hideTabBar();
       },
+
+      // 失去焦点
       cancleSearch () {
         this.focused = false;
         this.placeholder = '';
@@ -75,10 +71,63 @@
 
         // 显示tabBar
         uni.showTabBar();
+
+        this.query = ""
+        this.result = []
+      },
+
+      // 获取搜索建议
+      async input() {
+        // 判断, 输入的是否是空值, 空值则提示用户输入内容
+        // if (this.query.trim.length === 0) {
+        //   this.result = []
+        //   return
+        // }
+        const {message} = await this.request({
+          url: '/api/public/v1/goods/qsearch',
+          data: {
+            query: this.query
+          }
+        })
+        this.result = message
+      },
+
+      // 确认列表, 回车进入确认页面
+      confirm() {
+        // if (this.query.trim.length === 0) {
+        //   uni.showToast({
+        //     title: ' 请输入内容',
+        //     icon: 'none'
+        //   })
+        //   return
+        // }
+
+        // 添加历史搜索
+        // 将查询字符串添加到历史搜索的数组中
+        this.history.push(this.query)
+        // 使用集合将数组去重
+        this.history = [...new Set(this.history)]
+        // 存入本地
+        uni.setStorageSync('history', this.history)
+
+        uni.navigateTo({
+          url: '/pages/list/index?query=' + this.query
+        })
+      },
+
+      // 清除历史记录
+      clear() {
+        this.history = []
+        uni.setStorageSync('history', this.history)
       }
+    },
+
+    onLoad() {
+      this.input()
     }
   }
 </script>
+
 
 <style lang="less" scoped>
   .search {
