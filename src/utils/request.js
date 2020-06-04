@@ -9,7 +9,8 @@ export default function(Vue) {
 
       //  加载
       uni.showLoading({
-        title: '加载中...'
+        title: '加载中...',
+        mask: true
       })
 
       // 封装请求, uni-app 支持 promise async await处理
