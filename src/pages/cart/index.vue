@@ -56,7 +56,7 @@
       <view class="total">
         合计: <text>￥</text><label>{{sum}}</label><text>.00</text>
       </view>
-      <view class="pay">结算({{data.length}})</view>
+      <view class="pay" @tap="goPay">结算({{data.length}})</view>
     </view>
   </view>
 </template>
@@ -146,6 +146,37 @@
             this.addr.addr_detail = res.provinceName + res.cityName + res.countyName + res.detailInfo
           }
         })
+      },
+
+      // 结算前校验
+      goPay() {
+        if (!this.addr) {
+          uni.showToast({
+            title: "没有收货地址",
+            icon: 'none'
+          })
+          return
+        }
+        if (!this.data_buy.length) {
+          uni.showToast({
+            title: '没有结算的商品',
+            icon: 'none'
+          })
+          return
+        }
+        if (!uni.getStorageSync('token')) {
+          uni.navigateTo({
+            url: '/pages/auth/index'
+          })
+          uni.showToast({
+            title: '请获取token',
+            icon: 'none'
+          })
+        } else {
+          uni.navigateTo({
+            url: '/pages/order/index'
+          })
+        }
       }
     },
 
