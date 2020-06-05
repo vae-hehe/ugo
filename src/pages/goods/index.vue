@@ -2,47 +2,43 @@
   <view class="wrapper">
     <!-- 商品图片 -->
     <swiper class="pics" indicator-dots indicator-color="rgba(255, 255, 255, 0.6)" indicator-active-color="#fff">
-      <swiper-item>
-        <image src="http://static.botue.com/ugo/uploads/detail_1.jpg"></image>
-      </swiper-item>
-      <swiper-item>
-        <image src="http://static.botue.com/ugo/uploads/detail_2.jpg"></image>
-      </swiper-item>
-      <swiper-item>
-        <image src="http://static.botue.com/ugo/uploads/detail_3.jpg"></image>
-      </swiper-item>
-      <swiper-item>
-        <image src="http://static.botue.com/ugo/uploads/detail_4.jpg"></image>
-      </swiper-item>
-      <swiper-item>
-        <image src="http://static.botue.com/ugo/uploads/detail_5.jpg"></image>
+      <swiper-item v-for="item in goods.pics" :key="item.pics_id">
+        <image :src="item.pics_big"></image>
       </swiper-item>
     </swiper>
     <!-- 基本信息 -->
     <view class="meta">
-      <view class="price">￥199</view>
-      <view class="name">初语秋冬新款毛衣女 套头宽松针织衫简约插肩袖上衣</view>
+      <view class="price">￥{{goods.goods_price}}</view>
+      <view class="name">{{goods.goods_name}}</view>
       <view class="shipment">快递: 免运费</view>
       <text class="collect icon-star">收藏</text>
     </view>
     <!-- 商品详情 -->
     <view class="detail">
-      <rich-text></rich-text>
+      <rich-text :nodes="goods.goods_introduce"></rich-text>
     </view>
     <!-- 操作 -->
     <view class="action">
       <button open-type="contact" class="icon-handset">联系客服</button>
-      <text class="cart icon-cart" @click="goCart">购物车</text>
-      <text class="add">加入购物车</text>
-      <text class="buy" @click="createOrder">立即购买</text>
+      <text class="cart icon-cart" @tap="goCart">购物车</text>
+      <text class="add" @tap="add">加入购物车</text>
+      <text class="buy" @tap="createOrder">立即购买</text>
     </view>
   </view>
 </template>
 
 <script>
   export default {
+    data() {
+      return {
+        goods: {},
+        id: '',
+        list: uni.getStorageSync('list') || []
+      }
+    },
 
     methods: {
+      // 购物车
       goCart () {
         uni.switchTab({
           url: '/pages/cart/index'
@@ -52,7 +48,59 @@
         uni.navigateTo({
           url: '/pages/order/index'
         })
+      },
+
+      // 获取goods
+      async get_goods() {
+        const {message} = await this.request({
+          url: '/api/public/v1/goods/detail',
+          data: {
+            goods_id: this.id
+          }
+        })
+        console.log(message)
+        this.goods = message
+      },
+
+      // 加入购物车
+      add() {
+        // 自定义商品对象, 准备数据
+        var one = {
+          goods_id: this.goods.goods_id,
+          goods_name: this.goods.goods_name,
+          goods_price: this.goods.goods_price,
+          goods_small_logo: this.goods.goods_small_logo,
+          goods_number: 1
+        }
+        // 添加到数据, 判断是否重复
+        // 判断数组内是否有该物品
+        // this.list.forEach(function(item) {
+        //   if (item.goods_id === one.goods_id) {
+        //     item.goods_number++
+        //     return
+        //   }
+        // })
+        var key = false // 此时没有重复数据
+        for(var i = 0; i < this.list.length; i++) {
+          if (this.list[i].goods_id === one.goods_id) {
+            key = true
+            this.list[i].goods_number++
+            break
+          }
+        }
+        if (key === false) {
+          this.list.push(one)
+        }
+        uni.setStorageSync('list', this.list)
+        uni.showToast({
+          title: '添加成功'
+        })
       }
+    },
+
+    onLoad(e) {
+      this.id = e.id
+      this.get_goods()
     }
   }
 </script>
