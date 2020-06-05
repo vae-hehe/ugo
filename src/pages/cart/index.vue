@@ -2,80 +2,47 @@
   <view class="wrapper">
     <!-- 收货信息 -->
     <view class="shipment">
-      <view class="dt">收货人: </view>
-      <view class="dd meta">
-        <text class="name">刘德华</text>
-        <text class="phone">13535337057</text>
-      </view>
-      <view class="dt">收货地址:</view>
-      <view class="dd">广东省广州市天河区一珠吉</view>
+      <block v-if="addr">
+        <view class="dt">收货人: </view>
+        <view class="dd meta">
+          <text class="name">{{addr.userName}}</text>
+          <text class="phone">{{addr.telNumber}}</text>
+        </view>
+        <view class="dt">收货地址:</view>
+        <view class="dd">{{addr.addr_detail}}</view>
+      </block>
+
+      <button type="primary" @tap="get_addr" v-else>当点击获取收货地址</button>
     </view>
     <!-- 购物车 -->
     <view class="carts">
       <view class="item">
         <!-- 店铺名称 -->
         <view class="shopname">优购生活馆</view>
-        <view class="goods">
+        <view class="goods" v-for="(item, index) in data" :key="item.goods_id">
           <!-- 商品图片 -->
-          <image class="pic" src="http://static.botue.com/ugo/uploads/goods_1.jpg"></image>
+          <image class="pic" :src="item.goods_small_logo"></image>
           <!-- 商品信息 -->
           <view class="meta">
-            <view class="name">【海外购自营】黎珐(ReFa) MTG日本 CARAT铂金微电流瘦脸瘦身提拉紧致V脸美容仪 【保税仓发货】</view>
+            <view class="name">{{item.goods_name}}</view>
             <view class="price">
-              <text>￥</text>1399<text>.00</text>
+              <text>￥</text>{{item.goods_price}}<text>.00</text>
             </view>
             <!-- 加减 -->
             <view class="amount">
-              <text class="reduce">-</text>
-              <input type="number" value="1" class="number">
-              <text class="plus">+</text>
+              <text class="reduce" @tap="change(index, -1)">-</text>
+              <input type="number" :value="item.goods_number" class="number">
+              <text class="plus" @tap="change(index, 1)">+</text>
             </view>
           </view>
           <!-- 选框 -->
           <view class="checkbox">
-            <icon type="success" size="20" color="#ea4451"></icon>
-          </view>
-        </view>
-        <view class="goods">
-          <!-- 商品图片 -->
-          <image class="pic" src="http://static.botue.com/ugo/uploads/goods_2.jpg"></image>
-          <!-- 商品信息 -->
-          <view class="meta">
-            <view class="name">【海外购自营】黎珐(ReFa) MTG日本 CARAT铂金微电流瘦脸瘦身提拉紧致V脸美容仪 【保税仓发货】</view>
-            <view class="price">
-              <text>￥</text>1399<text>.00</text>
-            </view>
-            <!-- 加减 -->
-            <view class="amount">
-              <text class="reduce">-</text>
-              <input type="number" value="1" class="number">
-              <text class="plus">+</text>
-            </view>
-          </view>
-          <!-- 选框 -->
-          <view class="checkbox">
-            <icon type="success" size="20" color="#ea4451"></icon>
-          </view>
-        </view>
-        <view class="goods">
-          <!-- 商品图片 -->
-          <image class="pic" src="http://static.botue.com/ugo/uploads/goods_5.jpg"></image>
-          <!-- 商品信息 -->
-          <view class="meta">
-            <view class="name">【海外购自营】黎珐(ReFa) MTG日本 CARAT铂金微电流瘦脸瘦身提拉紧致V脸美容仪 【保税仓发货】</view>
-            <view class="price">
-              <text>￥</text>1399<text>.00</text>
-            </view>
-            <!-- 加减 -->
-            <view class="amount">
-              <text class="reduce">-</text>
-              <input type="number" value="1" class="number">
-              <text class="plus">+</text>
-            </view>
-          </view>
-          <!-- 选框 -->
-          <view class="checkbox">
-            <icon type="success" size="20" color="#ccc"></icon>
+            <icon
+              type="success"
+              size="20"
+              :color="item.goods_checked ? '#ea4451' : '#ccc'"
+              @tap="checked(index)"
+            ></icon>
           </view>
         </view>
       </view>
@@ -83,20 +50,110 @@
     <!-- 其它 -->
     <view class="extra">
       <label class="checkall">
-        <icon type="success" color="#ccc" size="20"></icon>
+        <icon type="success" :color="is ? '#ea4451' : '#ccc'" size="20" @tap="checkAll"></icon>
         全选
       </label>
       <view class="total">
-        合计: <text>￥</text><label>14110</label><text>.00</text>
+        合计: <text>￥</text><label>{{sum}}</label><text>.00</text>
       </view>
-      <view class="pay">结算(3)</view>
+      <view class="pay">结算({{data.length}})</view>
     </view>
   </view>
 </template>
 
 <script>
   export default {
-    
+    data() {
+      return {
+        data: [],
+        addr: null
+      }
+    },
+
+    computed: {
+      // 反选
+      data_buy() {
+        // 把选中的商品筛选出来
+        var arr = []
+        this.data.forEach(function(item) {
+          if (item.goods_checked) {
+            arr.push(item)
+          }
+        })
+        return arr
+      },
+      // 看选中的商品的长度和整个数组的长度是否一致
+      is() {
+        return this.data.length === this.data_buy.length
+      },
+
+      // 总价
+      sum() {
+        var sum = 0
+        this.data_buy.forEach(function(item) {
+          sum += item.goods_price * item.goods_number
+        })
+        return sum
+      }
+    },
+
+    methods: {
+      // 加减
+      change(index, step) {
+        if (step === -1 && this.data[index].goods_number <= 1) {
+          uni.showToast({
+            title: '商品数量不能小于1',
+            icon: 'none'
+          })
+          return
+        }
+        if (step === 1 && this.data[index].goods_number >= 10) {
+          uni.showToast({
+            title: '限购不能大于10件',
+            icon: 'none'
+          })
+          return
+        }
+        this.data[index].goods_number += step
+
+        uni.setStorageSync('list', this.data)
+      },
+
+      //单选
+      checked(index) {
+        this.data[index].goods_checked = !this.data[index].goods_checked
+        uni.setStorageSync('list', this.data)
+      },
+
+      //全选
+      checkAll() {
+        // 1. 全选现在的状态 this.is
+        // 2. 点击之后的全选的状态
+        var ck = !this.is
+        // 3. 点击之后的状态赋值给全部数据
+        this.data.forEach(function(item) {
+          item.goods_checked = ck
+        })
+        // 4. 改变的数据存入本地
+        uni.setStorageSync('list', this.data)
+      },
+
+      // 获取地址
+      get_addr() {
+        uni.chooseAddress({
+          success: (res) => {
+            this.addr = res
+            this.addr.addr_detail = res.provinceName + res.cityName + res.countyName + res.detailInfo
+          }
+        })
+      }
+    },
+
+    // 由于 data和 onLoad 在页面初始时, 只加载一次, 所以使用 onShow()
+    onShow() {
+      this.data = uni.getStorageSync('list')
+      console.log(this.data)
+    }
   }
 </script>
 

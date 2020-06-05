@@ -70,7 +70,9 @@
           goods_name: this.goods.goods_name,
           goods_price: this.goods.goods_price,
           goods_small_logo: this.goods.goods_small_logo,
-          goods_number: 1
+          goods_number: 1,
+          // 添加属性, 是要选中
+          goods_checked: true
         }
         // 添加到数据, 判断是否重复
         // 判断数组内是否有该物品
