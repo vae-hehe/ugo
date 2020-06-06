@@ -9,88 +9,27 @@
     </view>
     <!-- 订单 -->
     <scroll-view class="orders" scroll-y>
-      <view class="item">
+      <view class="item" v-for="order in orders" :key="order.order_id">
         <!-- 商品图片 -->
-        <image class="pic" src="http://static.botue.com/ugo/uploads/goods_1.jpg"></image>
-        <!-- 商品信息 -->
-        <view class="meta">
-          <view class="name">【海外购自营】黎珐(ReFa) MTG日本 CARAT铂金微电流瘦脸瘦身提拉紧致V脸美容仪 【保税仓发货】</view>
-          <view class="price">
-            <text>￥</text>1399<text>.00</text>
+        <block v-for="item in order.goods" :key="item.goods_id">
+          <image class="pic" :src="item.goods_small_logo"></image>
+          <!-- 商品信息 -->
+          <view class="meta">
+            <view class="name">{{item.goods_name}}</view>
+            <view class="price">
+              <text>￥</text>{{item.goods_price}}<text>.00</text>
+            </view>
+            <view class="num">x{{item.goods_number}}</view>
           </view>
-          <view class="num">x1</view>
-        </view>
+        </block>
         <!-- 总价 -->
         <view class="amount">
-          共1件商品 总计: ￥4099(含运费0.00)
+          共{{order.total_count}}件商品 总计: ￥{{order.total.price}}(含运费0.00)
         </view>
         <!-- 其它 -->
         <view class="extra">
-          订单号: GD20180511000000000178
-          <button size="mini" type="primary">支付</button>
-        </view>
-      </view>
-      <view class="item">
-        <!-- 商品图片 -->
-        <image class="pic" src="http://static.botue.com/ugo/uploads/goods_1.jpg"></image>
-        <!-- 商品信息 -->
-        <view class="meta">
-          <view class="name">【海外购自营】黎珐(ReFa) MTG日本 CARAT铂金微电流瘦脸瘦身提拉紧致V脸美容仪 【保税仓发货】</view>
-          <view class="price">
-            <text>￥</text>1399<text>.00</text>
-          </view>
-          <view class="num">x1</view>
-        </view>
-        <!-- 总价 -->
-        <view class="amount">
-          共1件商品 总计: ￥4099(含运费0.00)
-        </view>
-        <!-- 其它 -->
-        <view class="extra">
-          订单号: GD20180511000000000178
-          <button size="mini" type="primary">支付</button>
-        </view>
-      </view>
-      <view class="item">
-        <!-- 商品图片 -->
-        <image class="pic" src="http://static.botue.com/ugo/uploads/goods_1.jpg"></image>
-        <!-- 商品信息 -->
-        <view class="meta">
-          <view class="name">【海外购自营】黎珐(ReFa) MTG日本 CARAT铂金微电流瘦脸瘦身提拉紧致V脸美容仪 【保税仓发货】</view>
-          <view class="price">
-            <text>￥</text>1399<text>.00</text>
-          </view>
-          <view class="num">x1</view>
-        </view>
-        <!-- 总价 -->
-        <view class="amount">
-          共1件商品 总计: ￥4099(含运费0.00)
-        </view>
-        <!-- 其它 -->
-        <view class="extra">
-          订单号: GD20180511000000000178
-          <button size="mini" type="primary">支付</button>
-        </view>
-      </view>
-      <view class="item">
-        <!-- 商品图片 -->
-        <image class="pic" src="http://static.botue.com/ugo/uploads/goods_1.jpg"></image>
-        <!-- 商品信息 -->
-        <view class="meta">
-          <view class="name">【海外购自营】黎珐(ReFa) MTG日本 CARAT铂金微电流瘦脸瘦身提拉紧致V脸美容仪 【保税仓发货】</view>
-          <view class="price">
-            <text>￥</text>1399<text>.00</text>
-          </view>
-          <view class="num">x1</view>
-        </view>
-        <!-- 总价 -->
-        <view class="amount">
-          共1件商品 总计: ￥4099(含运费0.00)
-        </view>
-        <!-- 其它 -->
-        <view class="extra">
-          订单号: GD20180511000000000178
-          <button size="mini" type="primary">支付</button>
+          订单号: {{order.order_number}}
+          <button size="mini" type="primary" @tap="goMoney">支付</button>
         </view>
       </view>
     </scroll-view>
@@ -99,6 +38,45 @@
 
 <script>
   export default {
+    data() {
+      return {
+        orders: ''
+      }
+    },
+
+    methods: {
+      async get_order() {
+        const {message} = await this.request({
+          url: '/api/public/v1/my/orders/all',
+          method: 'GET',
+          header: {
+            Authorization: uni.getStorageSync('token')
+          },
+          data: {
+            type: 1
+          }
+        })
+
+        this.orders = message.orders
+      },
+
+      async goMoney() {
+        const {message} = await this.request({
+          url: '/api/public/v1/my/orders/req_unifiedorder',
+          method: 'POST',
+          header: {
+            Authorization: uni.getStorageSync('token')
+          },
+          data: this.orders.order_number
+        })
+        // 获取支付暗号之后, 调用 api 支付
+        uni.requestPayment(message.pay)
+      }
+    },
+
+    onLoad() {
+      this.get_order()
+    }
     
   }
 </script>

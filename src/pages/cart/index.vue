@@ -66,7 +66,8 @@
     data() {
       return {
         data: [],
-        addr: null
+        addr: null,
+        order: []
       }
     },
 
@@ -149,7 +150,7 @@
       },
 
       // 结算前校验
-      goPay() {
+      async goPay() {
         if (!this.addr) {
           uni.showToast({
             title: "没有收货地址",
@@ -176,6 +177,38 @@
           uni.navigateTo({
             url: '/pages/order/index'
           })
+        }
+
+        // 创建订单
+        // 需要token
+        // 向公司的服务器发送请求
+        // 将本地要购买的商品清空, 跳转到订单页面
+        const {message} = await this.request({
+          url: '/api/public/v1/my/orders/create',
+          method: 'POST',
+          header: {
+            Authorization: uni.getStorageSync('token')
+          },
+          data: {
+            order_price: this.sum,
+            consignee_addr: this.addr.addr_detail,
+            goods: this.data_buy
+          }
+        })
+        
+        // 如果订单创建成功, 删除本第要买的数据, 跳转到订单页
+        if(meta.status === 200) {
+          this.data_buy.forEach(item => {
+
+            if (this.data.goods_id === item.goods_id) {
+              this.data.splice(this.data.goods_id, 1)
+            }
+          })
+          uni.setStorageSync('list', this.data)   
+          // 跳转到登录页
+          uni.navigateTo({
+            url: '/pages/order/index'
+          })    
         }
       }
     },

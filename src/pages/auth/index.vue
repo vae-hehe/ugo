@@ -16,7 +16,7 @@
           this.get_token(res)
         }
       },
-      // 2. 用户点击获取
+      // 2. 用户点击获取token需要的数据
       btn_getUserInfo(e) {
         console.log(e.detail)
         this.get_token(e.detail)
